@@ -716,6 +716,11 @@ class Engagement(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True)
     active = models.BooleanField(default=True, editable=False)
     tracker = models.URLField(max_length=200, help_text="Link to epic or ticket system with changes to version.", editable=True, blank=True, null=True)
+    redmine = models.URLField(max_length=200, help_text="Link to Redmine Project.", editable=True, blank=True, null=True, default="http://redmine.ndepthsecurity.net/projects/__ENTER_TEXT_HERE__")
+    nessus = models.URLField(max_length=200, help_text="Link to Nessus.", editable=True, blank=True, null=True, default="https://nessus.ndepthsecurity.net:8834/")
+    gophish = models.URLField(max_length=200, help_text="Link to GoPhish.", editable=True, blank=True, null=True, default="https://gophish.ndepthsecurity.net:3333/login")
+    gdrive = models.URLField(max_length=200, help_text="Link to Google Drive.", editable=True, blank=True, null=True, default="https://drive.google.com/drive/u/0/folders/__ENTER_TEXT_HERE__")
+    timecard = models.URLField(max_length=200, help_text="Link to tsheets.", editable=True, blank=True, null=True, default="https://ndepthsecurity.tsheets.com/#w_timesheets_v2")
     test_strategy = models.URLField(editable=True, blank=True, null=True)
     threat_model = models.BooleanField(default=True)
     api_test = models.BooleanField(default=True)
@@ -2060,3 +2065,67 @@ watson.register(Finding_Template)
 watson.register(Endpoint)
 watson.register(Engagement)
 watson.register(App_Analysis)
+
+
+# VM infrastructure mgmt by nDepth
+class VM(models.Model):
+    short_name  = models.CharField(max_length=25)
+    IP          = models.CharField(max_length=15, default='127.0.0.1')
+    description = models.CharField(max_length=200, default="nDepth standard Kali Linux Virtual Machine for Penetration testing")
+    externalIP  = models.CharField(max_length=15, default='127.0.0.1')
+
+
+    class Meta:
+         verbose_name_plural = "VMs"
+
+    def fqdn(self):
+        return "%s.ndepthsecurity.net" %(self.short_name)
+
+    def total_uses_count(self):
+        return VMOnEngagement.objects.filter(vm=self).count()
+
+    def current_uses(self):
+        return VMOnEngagement.objects.filter(vm=self, engagement__active=True)
+
+    def past_uses(self):
+        return VMOnEngagement.objects.filter(vm=self, engagement__active=False)
+
+    def days_till_free(self):
+        days = []
+        for p in VMOnEngagement.objects.filter(vm=self):
+            days.append((p.engagement.target_end - get_current_datetime().date()).days)
+        return max(days) if days else 'Free'
+
+    def get_breadcrumbs(self):
+        bc = [{'title': self.__str__(),
+               'url': reverse('view_vm', args=(self.id,))}]
+        return bc
+
+    def __str__(self):
+        return "%s" %(self.short_name)
+
+
+class VMAdmin(admin.ModelAdmin):
+  list_display = ('short_name', 'IP', 'externalIP')
+
+admin.site.register(VM, VMAdmin)
+
+
+class VMOnEngagement(models.Model):
+    tester     = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='tester', null=True)
+    engagement = models.ForeignKey(Engagement, null=True, blank=True,
+                                   related_name="eng")
+    vm         = models.ForeignKey(VM, on_delete=models.SET_NULL, related_name='vm', blank=True, null=True)
+
+    def __str__(self):
+        return "%s: %s" %(self.engagement.product, self.engagement)
+
+    class Meta:
+        verbose_name_plural = "VMs On Engagement"
+
+
+class VMOnEngagementAdmin(admin.ModelAdmin):
+  list_filter = ['engagement', 'tester', 'vm']
+  list_display = ('engagement', 'tester', 'vm')
+
+admin.site.register(VMOnEngagement, VMOnEngagementAdmin)
