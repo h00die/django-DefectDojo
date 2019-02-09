@@ -42,7 +42,6 @@
     <link rel="shortcut icon" href="{% static "dojo/img/favicon.ico" %}"/>
     <link rel="stylesheet" href="{% static "fullcalendar/dist/fullcalendar.min.css" %}">
     <link rel="stylesheet" href="{% static "dojo/css/dojo.css" %}">
-    <link rel="stylesheet" href="{% static "dojo/css/nDepth.css" %}">
     <style>
         {% block add_styles %}
         {% endblock %}
@@ -62,7 +61,7 @@
                     <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="{% url 'home' %}">
-                    <span id="ndepthlogo"><font color="#C88989">n</font>Depth Security</span>
+                    <img src="{% static "dojo/img/logo.png" %}" alt="DefectDojo Logo" width="240"/>
                 </a>
 
             </div>
@@ -137,23 +136,23 @@
                             {% endif %}
                             <li>
                                 {% if request.user.is_staff %}
-                                    <a href="#"><i class="fa fa-list fa-fw"></i> <span>Customer</span>
+                                    <a href="#"><i class="fa fa-list fa-fw"></i> <span>Products</span>
                                         <span class="glyphicon arrow"></span></a>
                                 {% else %}
-                                    <a href="{% url 'product' %}" title="Product Listing"><i class="fa fa-list fa-fw"></i> <span>Customer</span></a>
+                                    <a href="{% url 'product' %}" title="Product Listing"><i class="fa fa-list fa-fw"></i> <span>Products</span></a>
                                 {% endif %}
                                 {% if request.user.is_staff %}
                                     <ul class="nav nav-second-level">
                                       {% if request.user.is_staff %}
                                         <li>
-                                            <a href="{% url 'new_product' %}"> Add Customer</a>
+                                            <a href="{% url 'new_product' %}"> Add Product</a>
                                         </li>
                                       {% endif %}
                                         <li>
-                                            <a href="{% url 'product' %}"> All Customers</a>
+                                            <a href="{% url 'product' %}"> All Products</a>
                                         </li>
                                         <li>
-                                            <a href="{% url 'product_type' %}">View Pentest Types</a>
+                                            <a href="{% url 'product_type' %}">View Product Types</a>
                                         </li>
 
                                     </ul>
@@ -228,8 +227,8 @@
                                         class="glyphicon arrow"></span></a>
                                 <ul class="nav nav-second-level">
                                     <li><a href="{% url 'critical_product_metrics' %}"> Critical Product Metrics </a></li>
-                                    <li><a href="{% url 'metrics_product_type' %}"> Pentest Type Metrics </a></li>
-                                    <li><a href="{% url 'product_type_counts' %}"> Pentest Type Counts </a></li>
+                                    <li><a href="{% url 'metrics_product_type' %}"> Product Type Metrics </a></li>
+                                    <li><a href="{% url 'product_type_counts' %}"> Product Type Counts </a></li>
                                     {% if user.is_staff %}
                                         <li><a href="{% url 'simple_metrics' %}"> Simple Metrics </a></li>
                                         <li><a href="{% url 'engineer_metrics' %}"> Engineer Metrics </a></li>

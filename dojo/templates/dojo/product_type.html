@@ -6,7 +6,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading tight">
                     <h3 class="has-filters">
-                        Pentest Type List
+                        Product Type List
                         <div class="dropdown pull-right">
                             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
                                     data-toggle="dropdown" aria-expanded="true">
@@ -18,7 +18,7 @@
                                 {% if request.user.is_staff %}
                                     <li role="presentation">
                                         <a href="{% url 'add_product_type' %}">
-                                            <i class="fa fa-plus"></i> Add Pentest Type
+                                            <i class="fa fa-plus"></i> Add Product Type
                                         </a>
                                     </li>
                                 {% endif %}
@@ -69,7 +69,7 @@
                                                 </a>
                                                 <a class="btn btn-sm btn-warning"
                                                    href="{% url 'edit_product_type' pt.id %}">
-                                                    <i class="fa fa-pencil"></i> Edit Pentest Type
+                                                    <i class="fa fa-pencil"></i> Edit Product Type
                                                 </a>
                                                 <a class="btn btn-sm btn-primary"
                                                    href="{% url 'product_type_report' pt.id %}">
@@ -89,7 +89,7 @@
                     {% include "dojo/paging_snippet.html" with page=pts page_size=True %}
                 </div>
             {% else %}
-                <p class="text-center">No Pentest Types found.</p>
+                <p class="text-center">No product types found.</p>
             {% endif %}
         </div>
     </div>

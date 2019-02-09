@@ -8,7 +8,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading tight">
                     <h3 class="has-filters">
-                        Customer List
+                        Product List
                         <div class="dropdown pull-right">
                             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
                                     data-toggle="dropdown" aria-expanded="true">
@@ -20,14 +20,14 @@
                                 {% if request.user.is_staff %}
                                     <li role="presentation">
                                         <a href="{% url 'new_product' %}">
-                                            <i class="fa fa-plus"></i> Add Customer
+                                            <i class="fa fa-plus"></i> Add Product
                                         </a>
                                     </li>
                                 {% endif %}
 
                                 <li role="presentation">
                                     <a href="{% url 'product_findings_report' %}">
-                                        <i class="fa fa-file-text-o"></i> Customer Report
+                                        <i class="fa fa-file-text-o"></i> Product Report
                                     </a>
                                 </li>
                             </ul>
@@ -48,7 +48,7 @@
                         <thead>
                         <tr>
                             <th></th>
-                            <th>{% dojo_sort request 'Customer' 'name' 'asc' %}</th>
+                            <th>{% dojo_sort request 'Product' 'name' 'asc' %}</th>
                             <th> Criticality</th>
                             <th> Metadata
                             <th></th>
@@ -58,7 +58,7 @@
                             <th> Findings</th>
                             <th> Endpoints</th>
                             <th> Contact</th>
-                            <th>{% dojo_sort request 'Pentest Type' 'prod_type__name' %}</th>
+                            <th>{% dojo_sort request 'Product Type' 'prod_type__name' %}</th>
                         </tr>
                         </thead>
                         <tbody>
