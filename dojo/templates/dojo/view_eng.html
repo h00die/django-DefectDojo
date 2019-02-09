@@ -551,6 +551,27 @@
             {% endif %}</td>
           </tr>
           <tr>
+            <td><strong>Redmine</strong></td>
+            <td><a href="{{eng.redmine}}" target="new">Redmine Link</a></td>
+          </tr>
+          <tr>
+            <td><strong>Nessus</strong></td>
+            <td><a href="{{eng.nessus}}" target="new">Nessus Link</a></td>
+          </tr>
+          <tr>
+            <td><strong><i class="fa fa-envelope-o"></i> GoPhish</strong></td>
+            <td><a href="{{eng.gophish}}" target="new">GoPhish Link</a></td>
+          </tr>
+          <tr>
+            <td><strong><i class="fa fa-google"></i> Google Drive</strong></td>
+            <td><a href="{{eng.gdrive}}" target="new">GDrive Link</a></td>
+          </tr>
+          <tr>
+            <td><strong><i class="fa fa-calendar"></i> Timecard</strong></td>
+            <td><a href="{{eng.timecard}}" target="new">tsheets</a></td>
+          </tr>
+          <!--
+          <tr>
             <td><strong>Tracker</strong></td>
             <td>
               {% if eng.tracker %}
@@ -579,6 +600,7 @@
             <td><a href="{{ jconf.url }}/browse/{{ jissue.jira_key }}" target="_blank"><i class="fa fa-external-link"></i> Jira Epic</a></td>
           </tr>
           {% endif %}
+          -->
           <tr>
             <td><strong>Updated</strong></td>
             <td><a target="_blank" data-toggle="tooltip" data-placement="bottom" title="{{ eng.updated|default_if_none:"" }}">

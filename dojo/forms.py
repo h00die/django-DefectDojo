@@ -628,7 +628,7 @@ class EngForm(forms.ModelForm):
         model = Engagement
         exclude = ('first_contacted', 'eng_type', 'real_start',
                    'real_end', 'requester', 'reason', 'updated', 'report_type',
-                   'product', 'threat_model', 'api_test', 'pen_test', 'check_list', 'engagement_type')
+                   'product', 'threat_model', 'api_test', 'pen_test', 'check_list', 'engagement_type', 'tracker', 'test_strategy', 'source_code_management_uri')
 
 
 class EngForm2(forms.ModelForm):
