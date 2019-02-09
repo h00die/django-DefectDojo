@@ -55,7 +55,7 @@ def product(request):
     """
     prods = ProductFilter(request.GET, queryset=initial_queryset, user=request.user)
     prod_list = get_page_items(request, prods.qs, 25)
-    add_breadcrumb(title="Customer List", top_level=not len(request.GET), request=request)
+    add_breadcrumb(title="Product List", top_level=not len(request.GET), request=request)
     return render(request,
                   'dojo/product.html',
                   {'prod_list': prod_list,
