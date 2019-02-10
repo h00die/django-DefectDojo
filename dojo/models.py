@@ -2101,12 +2101,16 @@ class VM(models.Model):
                'url': reverse('view_vm', args=(self.id,))}]
         return bc
 
+    def last_refresh_string(self):
+        latest = VMScriptLog.objects.filter(vm=self, script__short_name='REFRESH VM')
+        return "Never" if len(latest) == 0 else latest.latest('date').date.strftime("%m/%d/%Y, %H:%M:%S")
+
     def __str__(self):
         return "%s" %(self.short_name)
 
 
 class VMAdmin(admin.ModelAdmin):
-  list_display = ('short_name', 'IP', 'externalIP')
+    list_display = ('short_name', 'IP', 'externalIP')
 
 admin.site.register(VM, VMAdmin)
 
@@ -2125,7 +2129,43 @@ class VMOnEngagement(models.Model):
 
 
 class VMOnEngagementAdmin(admin.ModelAdmin):
-  list_filter = ['engagement', 'tester', 'vm']
-  list_display = ('engagement', 'tester', 'vm')
+    list_filter = ['engagement', 'tester', 'vm']
+    list_display = ('engagement', 'tester', 'vm')
 
 admin.site.register(VMOnEngagement, VMOnEngagementAdmin)
+
+
+class ManagementScript(models.Model):
+    TARGET_CHOICES = (
+        ('VM', 'VM Management'),
+        ('EN', 'Engagement Management')
+    )
+
+    target      = models.CharField(max_length=2, choices=TARGET_CHOICES, help_text="What the script manages")
+    short_name  = models.CharField(max_length=50, help_text="Short descriptive name of script")
+    description = models.CharField(max_length=150, help_text="Description of what the script does")
+    command     = models.CharField(max_length=100, help_text="Script with parameters.  If it is specific to a VM, use ?????????")
+    admin_only  = models.BooleanField(default=True, help_text="Should this only be accessable to Staff/Admin, or all pentesters")
+
+    def __str__(self):
+        return self.short_name
+
+class ManagementScriptAdmin(admin.ModelAdmin):
+    list_filter  = ['target', 'admin_only']
+    list_display = ('target', 'short_name', 'description', 'admin_only')
+
+admin.site.register(ManagementScript, ManagementScriptAdmin)
+
+
+class VMScriptLog(models.Model):
+    vm       = models.ForeignKey(VM, on_delete=models.SET_NULL, related_name='log', blank=True, null=True)
+    script   = models.ForeignKey(ManagementScript, on_delete=models.SET_NULL, related_name='log', blank=True, null=True)
+    executer = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='log', null=True)
+    date     = models.DateTimeField(editable=False, auto_now_add=True)
+    result   = models.TextField(help_text="Output from the script after running", blank=True, null=True)
+
+class VMScriptLogAdmin(admin.ModelAdmin):
+    list_filter = ['vm', 'script', 'executer']
+    list_display = ['date', 'vm', 'script', 'executer']
+
+admin.site.register(VMScriptLog, VMScriptLogAdmin)

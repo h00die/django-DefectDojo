@@ -27,7 +27,7 @@ from dojo.forms import VMForm, DeleteVMForm, AddVMEngagementForm, DeleteVMEngage
 #    UploadThreatForm, UploadRiskForm, NoteForm, DoneForm, \
 #    EngForm, TestForm, ReplaceRiskAcceptanceForm, AddFindingsRiskAcceptanceForm, DeleteEngagementForm, ImportScanForm, \
 #    JIRAFindingForm, CredMappingForm
-from dojo.models import VM, VMOnEngagement
+from dojo.models import VM, VMOnEngagement, ManagementScript, VMScriptLog
 #Finding, Product, Engagement, Test, \
 #from dojo.models import Finding, Product, Engagement, Test, \
 #    Check_List, Test_Type, Notes, \
@@ -100,9 +100,14 @@ def new_vm(request):
 def view_vm(request, id):
     vm = get_object_or_404(VM, id=id)
     add_breadcrumb(parent=vm, top_level=False, request=request)
+    if request.user.is_staff:
+      avail_scripts = ManagementScript.objects.filter(target='VM')
+    else:
+      avail_scripts = ManagementScript.objects.filter(target='VM', admin_only=False)
     return render(
         request, 'dojo/view_vm.html', {
             'vm': vm,
+            'scripts': avail_scripts
         })
 
 @user_passes_test(lambda u: u.is_staff)
@@ -221,3 +226,25 @@ def ping_vm(request, id):
                    'status':'up' if response else 'down',
                    'time':timezone.now().strftime("%m/%d/%Y, %H:%M:%S")
                })
+
+@user_passes_test(lambda u: u.is_staff)
+def run_script(request, id, sid):
+    vm = get_object_or_404(VM, pk=id)
+    script = get_object_or_404(ManagementScript, pk=sid)
+    log = VMScriptLog(vm=vm, script=script, executer=request.user)
+    log.save()
+    try:
+        response = subprocess.check_output(script.command.split(), shell=False)
+        jresponse = "Success"
+    except subprocess.CalledProcessError as e:
+        response = ["Process Errored.  Log:"]
+        response.append("Return Code: %s" %(e.returncode))
+        response.append("cmd: %s" %(e.cmd))
+        response.append("output: %s" %(e.output))
+        response = '\n'.join(response)
+        jresponse = "Failed"
+    log.result = response
+    log.save()
+    return JsonResponse({'status':jresponse})
+
+

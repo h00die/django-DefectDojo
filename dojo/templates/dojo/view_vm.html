@@ -136,6 +136,39 @@
           </div>
         {% endif %}
       </div>
+    {% if request.user.is_staff %}
+      <div class="panel panel-default table-responsive">
+        <div class="panel-heading">
+          <h4> Management Script Log</h4>
+        </div>
+          {% if vm.log.all.count == 0 %}
+            <div class="panel-body">
+              <p class="text-muted">No management scripts run.</p>
+            </div>
+          {% else %}
+            <div class="table-responsive">
+              <table class="tablesorter-bootstrap table table-condensed table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Script Name</th>
+                    <th>Runner</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for log in vm.log.all %}
+                    <tr>
+                      <td>{{log.date|date:"l, jS F Y" }}</td>
+                      <td>{{log.script}}</td>
+                      <td>{{log.executer}}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
 
 <!-- Sidebar -->
 </div>
@@ -151,6 +184,10 @@
           <tr>
             <td><strong>Online Status</strong></td>
             <td><span id="ping{{vm.id}}" class="circle"></span></td>
+          </tr>
+          <tr>
+            <td><strong>Last Refresh</strong></td>
+            <td>{{ vm.last_refresh_string }}</td>
           </tr>
           <tr>
             <td><strong>Dates Till Unused</strong></td>
@@ -187,6 +224,34 @@
       </table>
     </div>
   </div>
+
+  <div>
+    <div class="panel panel-default-secondary">
+      <div class="panel-heading">
+        <h4><span class="fa fa-key" aria-hidden="true"></span>
+          Management Scripts
+        </h4>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <tbody>
+             {% if scripts %}
+               {% for script in scripts.all %}
+                 <tr>
+                   <td>{{script.short_name}}</td>
+                   <td><button class="btn btn-sm btn-success" name="RunScript{{script.id}}">Run</button></td>
+                 </tr>
+                {% endfor %}
+             {% else %}
+               <tr>
+                 <td>No scripts available</td>
+               </tr>
+             {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   <div>
     <div class="panel panel-default-secondary">
       <div class="panel-heading">
@@ -209,6 +274,7 @@
         </table>
       </div>
     </div>
+
 </div>
 
 </div>
@@ -271,5 +337,27 @@
         xmlhttp.open("GET", "{% url 'ping_vm' vm.id %}", true);
         xmlhttp.send();
       });
+    </script>
+    <script>
+      {% for script in scripts.all %}
+        $("button[name='RunScript{{script.id}}']").click(function(e) {
+          e.preventDefault();
+          $.ajax({
+            url: "{% url 'run_script' vm.id script.id %}",
+            success: function(result) {
+              $('#alert_placeholder').append('<div class="alert alert-success alert-dismissible" role="alert">' + 
+                                               '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' + 
+                                                'Command Successful</div>')
+              //setTimeout(function() {$("#alertdiv").remove();}, 5000);
+            },
+            error: function(result) {
+              $('#alert_placeholder').append('<div class="alert alert-danger alert-dismissible" role="alert">' + 
+                                               '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' + 
+                                                'Command Failed, refresh for log</div>')
+              //setTimeout(function() {$("#alertdiv").remove();}, 5000);
+            }
+          });
+        });
+      {% endfor %}
     </script>
 {% endblock %}

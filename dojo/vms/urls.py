@@ -18,4 +18,6 @@ urlpatterns = [
         name='add_vm_engagement'),
     url(r'^vm/(?P<id>\d+)/delete_engagement$', views.delete_vm_engagement,
         name='delete_vm_engagement'),
+    url(r'^vm/(?P<id>\d+)/run_script/(?P<sid>\d+)$', views.run_script,
+        name='run_script'),
 ]
