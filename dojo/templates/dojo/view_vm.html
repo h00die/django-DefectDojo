@@ -149,6 +149,10 @@
       <table class="table table-striped">
         <tbody>
           <tr>
+            <td><strong>Online Status</strong></td>
+            <td><span id="ping{{vm.id}}" class="circle"></span></td>
+          </tr>
+          <tr>
             <td><strong>Dates Till Unused</strong></td>
             <td>{{ vm.days_till_free }}</td>
           </tr>
@@ -250,8 +254,22 @@
                 $('input#simple_search').val(terms);
             }
         });
-
-
-
+    </script>
+    <script>
+      function process_ping(result, id){
+        $("#ping"+id).addClass(result.status == "up"? "greencircle" : "redcircle");
+        $("#ping"+id).attr('title', result.time);
+      }
+      $( document ).ready(function() {
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            var myArr = JSON.parse(this.responseText);
+            process_ping(myArr, '{{vm.id}}');
+          }
+        };
+        xmlhttp.open("GET", "{% url 'ping_vm' vm.id %}", true);
+        xmlhttp.send();
+      });
     </script>
 {% endblock %}

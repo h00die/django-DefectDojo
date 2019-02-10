@@ -37,7 +37,7 @@
 
                         {% for v in vms %}
                             <tr>
-                                <td class="prod_name"><a href="{% url 'view_vm' v.id %}">{{ v.short_name }}</a>
+                                <td class="prod_name"><span id="ping{{v.id}}" class="circle"></span><a href="{% url 'view_vm' v.id %}"> {{ v.short_name }}</a>
                                 </td>
                                 <td class="prod_name">{{ v.IP }}</td>
                                 <td class="prod_name">{{ v.externalIP }}</td>
@@ -108,4 +108,23 @@
         });
     </script>
     {% include "dojo/filter_js_snippet.html" %}
+    <script>
+      function process_ping(result, id){
+        $("#ping"+id).addClass(result.status == "up"? "greencircle" : "redcircle");
+        $("#ping"+id).attr('title', result.time);     
+      }
+      {% for v in vms %}
+         $( document ).ready(function() {
+           var xmlhttp = new XMLHttpRequest();
+           xmlhttp.onreadystatechange = function() {
+             if (this.readyState == 4 && this.status == 200) {
+               var myArr = JSON.parse(this.responseText);
+               process_ping(myArr, '{{v.id}}');
+             }
+           };
+           xmlhttp.open("GET", "{% url 'ping_vm' v.id %}", true);
+           xmlhttp.send();
+         });
+      {% endfor %}
+    </script>
 {% endblock %}

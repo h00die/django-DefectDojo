@@ -1,8 +1,12 @@
 # #  vms
 import logging
-#import os
 #from datetime import datetime
 import operator
+#import os
+
+import subprocess
+from django.http import JsonResponse
+import re
 
 #from django.contrib.auth.models import User
 #from django.conf import settings
@@ -14,7 +18,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect, StreamingHttpResponse, Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404
 #from django.views.decorators.cache import cache_page
-#from django.utils import timezone
+from django.utils import timezone
 #from time import strftime
 
 from dojo.filters import VMFilter
@@ -206,3 +210,14 @@ def delete_vm_engagement(request, id):
         'rels': rels,
     })
 
+def ping_vm(request, id):
+    vm = get_object_or_404(VM, pk=id)
+    if vm.IP.startswith('10.') and re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",vm.IP):
+        try:
+            response = subprocess.check_output(["ping", "-c", "1", vm.IP], shell=False)
+        except subprocess.CalledProcessError:
+            response = False
+        return JsonResponse({
+                   'status':'up' if response else 'down',
+                   'time':timezone.now().strftime("%m/%d/%Y, %H:%M:%S")
+               })

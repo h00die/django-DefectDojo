@@ -306,7 +306,7 @@
     <div id="risk" class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h4> Virtual Machines
+                <h4> Virtual Machines ({{eng.eng.all.count}})
                     {% if request.user.is_staff %}
                         <a title="Add Virtual Machine" class="pull-right btn btn-sm btn-primary"
                            href="{% url 'add_vm_engagement' eng.id %}"><span class="fa fa-plus"></span></a>
@@ -314,7 +314,7 @@
                     {% endif %}
                 </h4>
             </div>
-            {% if  eng.eng %}
+            {% if  eng.eng.all %}
                 <div class="table-responsive">
                     <table id="open_findings"
                            class="tablesorter-bootstrap table table-condensed table-striped">
